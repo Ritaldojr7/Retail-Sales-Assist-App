@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A1128">
+  <title>Retail Sales Assist</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SalesAssist">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- html2canvas library for taking DSR snapshots -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+  <!-- ── Top Header ── -->
+  <header id="topbar">
+    <div class="wordmark">retail<span class="dot">.</span><span class="hub">SALES ASSIST</span></div>
+    <button id="profileBtn" hidden>Set up</button>
+  </header>
+
+  <!-- ── Main Application Body ── -->
+  <main>
+
+    <!-- ═══ SETUP VIEW ═══ -->
+    <section class="view" id="view-setup">
+      <div class="setuplogo">
+        <div class="wm">retail<span>.</span></div>
+        <div class="tag">SALES ASSIST</div>
+      </div>
+      <p class="sub" style="text-align:center">Identity Setup. Set your credentials to begin logging.</p>
+      <div class="setupcard">
+        <label class="f" for="su-city">City</label>
+        <select id="su-city"><option value="">Select city</option></select>
+
+        <label class="f" for="su-store">Store</label>
+        <select id="su-store"><option value="">Select store</option></select>
+
+        <label class="f" for="su-role">Your Role</label>
+        <select id="su-role"><option value="">Select role</option></select>
+
+        <label class="f" for="su-name">Your Name</label>
+        <input type="text" id="su-name" placeholder="e.g. Rahul Sharma" autocomplete="name">
+
+        <button class="btn" id="su-save">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Get Started
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══ HOME VIEW ═══ -->
+    <section class="view" id="view-home">
+      <div class="greet">
+        <div class="hi" id="greetName">Hello</div>
+        <div class="day" id="greetDay"></div>
+      </div>
+
+      <div class="section-title">Core Activities</div>
+      <div class="tiles">
+        <button class="tile lead" data-open-direct="lead">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+          </span>
+          <span>
+            <span class="t">Register a Lead</span><br>
+            <span class="d">Capture customer details in the Zoho form</span>
+          </span>
+          <span class="go">›</span>
+        </button>
+
+        <button class="tile rloss" data-open-direct="rloss">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 17l-7.5-7.5-4 4L2 5"/><path d="M16 17h6v-6"/></svg>
+          </span>
+          <span>
+            <span class="t">Log a Lost Sale (R-Loss)</span><br>
+            <span class="d">Tell us why the sale didn't happen</span>
+          </span>
+          <span class="go">›</span>
+        </button>
+
+        <button class="tile voice" data-open-direct="objection">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 19v3"/></svg>
+          </span>
+          <span>
+            <span class="t">Objections & Aggregation</span><br>
+            <span class="d">Record objection floor-audio & expert Q&A</span>
+          </span>
+          <span class="go">›</span>
+        </button>
+      </div>
+
+      <div class="section-title">Reports & Submissions</div>
+      <div class="tiles">
+        <button class="tile dsr" data-open-direct="dsr">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </span>
+          <span>
+            <span class="t">DSR Creation & Tracking</span><br>
+            <span class="d">Fill numbers, preview table, take snapshot & save</span>
+          </span>
+          <span class="go">›</span>
+        </button>
+
+        <button class="tile footfall" data-open-direct="footfall">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span>
+            <span class="t">Mid-Day Footfall Reporting</span><br>
+            <span class="d">Weekly store mid-day entry & weekend compliance</span>
+          </span>
+          <span class="go">›</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══ LEADS VIEW ═══ -->
+    <section class="view" id="view-lead">
+      <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div><h1>Register a Lead</h1></div>
+      <p class="sub">Fill details directly into the Zoho Leads Portal.</p>
+      <div class="framewrap" id="leadFrameWrap"></div>
+    </section>
+
+    <!-- ═══ R-LOSS VIEW ═══ -->
+    <section class="view" id="view-rloss">
+      <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 17l-7.5-7.5-4 4L2 5"/><path d="M16 17h6v-6"/></svg></div><h1>Log a Lost Sale</h1></div>
+      <p class="sub">Log non-converting customer interactions to build stocking strategy.</p>
+      <div class="as-line" id="asRloss"></div>
+
+      <div class="card">
+        <label class="f">Product Category <span class="opt">(select all that apply)</span></label>
+        <div class="chips" id="rl-category" role="group" aria-label="Product Category"></div>
+
+        <label class="f" for="rl-product">Specific Model / Variant <span class="opt">(optional)</span></label>
+        <input type="text" id="rl-product" placeholder="e.g. ErgoLuxe Pro Medium, Cushions M">
+
+        <label class="f">Reason for Loss</label>
+        <div class="chips" id="rl-reasons" role="group" aria-label="Reason for Lost Sale"></div>
+
+        <div id="rl-objwrap" hidden>
+          <label class="f" for="rl-objection">Customer Objection Details</label>
+          <textarea id="rl-objection" placeholder="Write down exact details of customer concern..."></textarea>
+        </div>
+
+        <label class="f">Estimated Value</label>
+        <div class="chips" id="rl-values" role="group" aria-label="Ticket Value"></div>
+
+        <label class="f">Lead Registered?</label>
+        <div class="chips" id="rl-lead" role="group" aria-label="Lead registered">
+          <button class="chip" type="button" data-val="Yes">Yes</button>
+          <button class="chip" type="button" data-val="No">No</button>
+        </div>
+
+        <label class="f" for="rl-notes">Additional Context <span class="opt">(optional)</span></label>
+        <textarea id="rl-notes" placeholder="Competitor comparisons, specific custom options requested..."></textarea>
+
+        <button class="btn" id="rl-submit">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Lost Sale
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══ OBJECTIONS VIEW ═══ -->
+    <section class="view" id="view-objection">
+      <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 19v3"/></svg></div><h1>Objections Recorder & QA</h1></div>
+      <p class="sub">Speak and record customer feedback fresh from the floor.</p>
+      <div class="as-line" id="asVoice"></div>
+
+      <div class="recwrap" id="recwrap">
+        <p class="prompt">Tap the mic and speak: What was the main customer block, and where did we get stuck?</p>
+        <p class="prompt-sub">Speak in standard language (2 minutes limit)</p>
+        <div class="micring">
+          <button class="micbtn" id="micBtn" aria-label="Record voice objection">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 19v3"/></svg>
+          </button>
+        </div>
+        <div class="timer" id="recTimer">0:00</div>
+        <div class="recstate" id="recState">Tap to start recording</div>
+
+        <div class="recreview">
+          <audio id="recAudio" controls></audio>
+          <label class="f" for="rec-context" style="text-align:left">Summary Context <span class="opt">(optional)</span></label>
+          <input type="text" id="rec-context" placeholder="e.g. Ortho insole price objection">
+          <div class="btn-row">
+            <button class="btn ghost" id="recRedo">Discard & Retry</button>
+            <button class="btn" id="recSend">Upload Voice Note</button>
+          </div>
+        </div>
+      </div>
+
+      <h2>Expert Help Q&A</h2>
+      <div class="card">
+        <label class="f" for="ex-q">Ask a new question to HQ Experts</label>
+        <textarea id="ex-q" placeholder="Type specific questions (e.g., matching competitor model differences)..."></textarea>
+        <button class="btn" id="ex-send" style="margin-top:10px;">Send Question</button>
+
+        <div class="tabs" role="tablist">
+          <button class="tab" id="tab-all" role="tab" aria-selected="true">All Answers</button>
+          <button class="tab" id="tab-mine" role="tab" aria-selected="false">My Questions</button>
+        </div>
+        <button class="refresh" id="ex-refresh">↻ Refresh Feed</button>
+        <div id="ex-feed"><div class="feedempty">Loading...</div></div>
+      </div>
+    </section>
+
+    <!-- ═══ DSR VIEW (Dedicated Top-Level View) ═══ -->
+    <section class="view" id="view-dsr">
+      <div class="view-head">
+        <button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="view-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <h1>DSR Creation & Tracking</h1>
+      </div>
+      <p class="sub">Input daily sales values. Calculate metrics and take shareable snapshot.</p>
+      <div class="as-line" id="asDSR"></div>
+
+      <div class="card">
+        <label class="f" for="dsr-date">Reporting Date</label>
+        <input type="date" id="dsr-date">
+
+        <!-- Dynamic Sales Fields based on store -->
+        <div id="dsr-sales-section">
+          <!-- Dynamically populated fields go here -->
+        </div>
+
+        <label class="f" for="dsr-cc-orders">C&C Orders</label>
+        <input type="number" id="dsr-cc-orders" value="0" min="0">
+
+        <label class="f" for="dsr-online-orders">Online Orders</label>
+        <input type="number" id="dsr-online-orders" value="0" min="0">
+
+        <label class="f" for="dsr-new-walkins">New Walk-ins</label>
+        <input type="number" id="dsr-new-walkins" value="0" min="0">
+
+        <label class="f" for="dsr-other-walkins">Other Walk-ins</label>
+        <input type="number" id="dsr-other-walkins" value="0" min="0">
+
+        <label class="f" for="dsr-cash-counter">Cash In Counter (₹)</label>
+        <input type="number" id="dsr-cash-counter" value="0" min="0">
+
+        <label class="f" for="dsr-reviews-taken">GMB Reviews Taken</label>
+        <input type="number" id="dsr-reviews-taken" value="0" min="0">
+
+        <label class="f" for="dsr-leads-captured">Leads Captured</label>
+        <input type="number" id="dsr-leads-captured" value="0" min="0">
+
+        <label class="f" for="dsr-last-month-rev">Last Month's Revenue Reference (₹)</label>
+        <input type="number" id="dsr-last-month-rev" value="0" min="0">
+      </div>
+
+      <h2>Preview Table Format</h2>
+      <!-- Excel table representation container -->
+      <div class="table-responsive" id="dsr-table-capture-area">
+        <table class="dsr-excel-table" id="dsr-preview-table">
+          <!-- Dynamically populated rows matching Images 2 & 3 -->
+        </table>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="dsr-snap-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Take Snapshot
+        </button>
+        <button class="btn" id="dsr-save-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save DSR
+        </button>
+      </div>
+
+      <h2 style="margin-top: 30px;">DSR Entry Log History</h2>
+      <div class="card">
+        <div class="history-list" id="dsr-history-list">
+          <!-- Local storage log items go here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ MID-DAY FOOTFALL VIEW (Dedicated Top-Level View) ═══ -->
+    <section class="view" id="view-footfall">
+      <div class="view-head">
+        <button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <div class="view-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h1>Mid-Day Footfall Reporting</h1>
+      </div>
+      <p class="sub">To Be Filled by all the Store Managers</p>
+
+      <!-- Google Form emulation structure -->
+      <div class="card" style="border-top: 8px solid #5846B6; border-radius: 8px;">
+        <h2 style="margin: 0; color: #FFF; font-size: 19px;">Mid-Day Footfall Form</h2>
+        <p style="font-size: 12.5px; color: var(--slate); margin-top: 4px;">To Be Filled by all the Store Managers</p>
+        <hr style="border: 0; border-top: 1px solid var(--line); margin: 12px 0;">
+
+        <!-- Form Fields matching Images 4 & 5 & 6 -->
+        <label class="f" for="ff-store-select">Store Name <span style="color: var(--red);">*</span></label>
+        <select id="ff-store-select">
+          <option value="">Select store</option>
+        </select>
+
+        <label class="f" for="ff-manager-name">Store Manager Name <span style="color: var(--red);">*</span></label>
+        <input type="text" id="ff-manager-name" placeholder="Your answer">
+
+        <label class="f" for="ff-date">Date <span style="color: var(--red);">*</span></label>
+        <input type="date" id="ff-date">
+
+        <label class="f" for="ff-count">Footfall Count (Till Mid-day) - 11am to 5pm <span style="color: var(--red);">*</span></label>
+        <input type="number" id="ff-count" placeholder="Your answer" min="0">
+
+        <label class="f" for="ff-sales-done">Sales Done till now <span style="color: var(--red);">*</span></label>
+        <input type="number" id="ff-sales-done" placeholder="Your answer" min="0">
+
+        <label class="f" for="ff-anomaly">Any footfall anomaly or reason for high/low traffic?</label>
+        <textarea id="ff-anomaly" placeholder="Your answer"></textarea>
+
+        <label class="f" for="ff-remarks">Remarks (if Any)</label>
+        <textarea id="ff-remarks" placeholder="Your answer"></textarea>
+
+        <button class="btn" id="ff-submit" style="margin-top: 20px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Submit Form
+        </button>
+      </div>
+    </section>
+
+    <!-- ═══ ANALYTICS VIEW (Metrics, Price Suggestion, Links) ═══ -->
+    <section class="view" id="view-analytics">
+      <div class="tabs" role="tablist">
+        <button class="tab" id="analytics-tab-store" role="tab" aria-selected="true">Store Analytics</button>
+        <button class="tab" id="analytics-tab-suggest" role="tab" aria-selected="false">Price Suggestion</button>
+        <button class="tab" id="analytics-tab-links" role="tab" aria-selected="false">Useful Links</button>
+      </div>
+
+      <!-- Store level Analytics Panel -->
+      <div class="task-panel" id="panel-store">
+        <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></div><h1>Store Performance</h1></div>
+        <p class="sub">Key metrics tracking for current active store.</p>
+        <div class="as-line" id="asAnalytics"></div>
+
+        <div class="analytics-summary">
+          <div class="metric-card">
+            <div class="lbl">MTD Revenue</div>
+            <div class="val" id="an-mtd-rev">₹0</div>
+          </div>
+          <div class="metric-card">
+            <div class="lbl">Avg. Conversion (CVR)</div>
+            <div class="val" id="an-avg-cvr">0%</div>
+          </div>
+          <div class="metric-card">
+            <div class="lbl">Reviews Captured</div>
+            <div class="val" id="an-reviews">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="lbl">Leads Registered</div>
+            <div class="val" id="an-leads">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Daily CVR Trend (Last 7 Days)</h3>
+          <div style="margin-top:15px; position:relative; height:120px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 10px;">
+            <!-- Custom Dynamic styled SVG bars -->
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">32%</span>
+              <div style="width:14px; height:45px; background:var(--yellow); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Mon</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">40%</span>
+              <div style="width:14px; height:56px; background:var(--yellow); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Tue</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">28%</span>
+              <div style="width:14px; height:39px; background:var(--yellow); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Wed</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">45%</span>
+              <div style="width:14px; height:63px; background:var(--yellow); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Thu</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">52%</span>
+              <div style="width:14px; height:73px; background:var(--green); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Fri</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">55%</span>
+              <div style="width:14px; height:77px; background:var(--green); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Sat</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; flex:1;">
+              <span style="font-size:10px; color:var(--slate);">48%</span>
+              <div style="width:14px; height:67px; background:var(--yellow); border-radius:3px; margin:4px 0;"></div>
+              <span style="font-size:9px; color:var(--slate);">Sun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Suggestion Panel -->
+      <div class="task-panel" id="panel-suggest" style="display:none;">
+        <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div><h1>Price Suggestion Engine</h1></div>
+        <p class="sub">Find best product matches and discount thresholds for custom budgets.</p>
+
+        <div class="card">
+          <label class="f" for="sug-cat">Category Interest</label>
+          <select id="sug-cat">
+            <option value="">Select category</option>
+            <option value="Chairs">Chairs</option>
+            <option value="Desks & Workspace">Desks & Workspace</option>
+            <option value="Insoles">Insoles</option>
+            <option value="Footwear">Footwear</option>
+            <option value="Cushions">Cushions</option>
+            <option value="Pillows">Pillows</option>
+          </select>
+
+          <label class="f" for="sug-budget">Customer Budget Range (₹)</label>
+          <input type="number" id="sug-budget" placeholder="e.g. 5000">
+
+          <button class="btn" id="sug-calc" style="margin-top:15px;">Calculate Suggestions</button>
+
+          <div id="sug-output" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Useful Links Panel -->
+      <div class="task-panel" id="panel-links" style="display:none;">
+        <div class="view-head"><button class="back-btn" aria-label="Go back"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button><div class="view-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><h1>All Links Aggregator</h1></div>
+        <p class="sub">Quick access links to relevant company services and guides.</p>
+        <div class="links-grid" id="links-grid-container">
+          <!-- Dynamic list of external support tools and portals -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Bottom Navigation Bar ── -->
+  <nav id="bottomnav">
+    <div class="nav-grid">
+      <button class="nav-item active" data-tab="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-tab="dsr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>DSR</span>
+      </button>
+      <button class="nav-item" data-tab="footfall">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Footfall</span>
+      </button>
+      <button class="nav-item" data-tab="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Analytics</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Toast notifications -->
+  <div id="toast" role="status"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/database.js"></script>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/dsr.js"></script>
+  <script type="module" src="js/footfall.js"></script>
+</body>
+</html>
