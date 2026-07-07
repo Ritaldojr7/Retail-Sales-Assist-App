@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSignIn, useSignUp, useAuth } from "@clerk/nextjs";
 import { CONFIG } from "@/lib/database";
 import { getStoreFromEmail, validateStoreEmail } from "@/lib/store-auth";
@@ -27,6 +28,7 @@ import { PrimaryButton } from "@/components/Buttons";
 import { ArrowRight } from "lucide-react";
 
 export default function SignInPage() {
+  const router = useRouter();
   const { isSignedIn, isLoaded: authLoaded } = useAuth();
   const { signIn, fetchStatus: signInFetchStatus } = useSignIn();
   const { signUp } = useSignUp();
@@ -57,9 +59,13 @@ export default function SignInPage() {
     ? adminUsernameFromEmail(storeEmail)
     : dashboardUsernameFromName(fullName);
 
+  const goHome = () => {
+    router.replace("/");
+  };
+
   useEffect(() => {
-    if (isSignedIn) window.location.assign("/");
-  }, [isSignedIn]);
+    if (isSignedIn) router.replace("/");
+  }, [isSignedIn, router]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -152,17 +158,19 @@ export default function SignInPage() {
       return;
     }
 
-    const { error: finalizeError } = await signIn.finalize();
+    const { error: finalizeError } = await signIn.finalize({
+      navigate: () => {
+        if (profile) saveProfile(profile);
+        setAwaitingVerification(false);
+        setVerificationCode("");
+        setPendingProfile(null);
+        goHome();
+      },
+    });
     if (finalizeError) {
       setError(finalizeError.longMessage || finalizeError.message);
       return;
     }
-
-    if (profile) saveProfile(profile);
-    setAwaitingVerification(false);
-    setVerificationCode("");
-    setPendingProfile(null);
-    window.location.assign("/");
   };
 
   const beginSecondFactor = async (
@@ -259,15 +267,17 @@ export default function SignInPage() {
       return;
     }
 
-    const { error: finalizeError } = await signUp.finalize();
+    const { error: finalizeError } = await signUp.finalize({
+      navigate: () => {
+        const profile = buildStaffProfile();
+        if (profile) saveProfile(profile);
+        goHome();
+      },
+    });
     if (finalizeError) {
       setError(finalizeError.longMessage || finalizeError.message);
       return;
     }
-
-    const profile = buildStaffProfile();
-    if (profile) saveProfile(profile);
-    window.location.assign("/");
   };
 
   const handleRegister = async () => {

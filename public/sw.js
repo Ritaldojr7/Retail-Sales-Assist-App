@@ -1,63 +1,49 @@
-const CACHE_NAME = "retail-sales-assist-v1";
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png"
-];
+const CACHE_NAME = "retail-sales-assist-v3";
+const ASSETS = ["/", "/manifest.json", "/icon-192.png", "/icon-512.png"];
 
-// Install Event
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate Event
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : undefined)))
+      )
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch Event - Network First with Cache Fallback
-self.addEventListener("fetch", (e) => {
-  // Only handle GET requests for app assets
-  if (e.request.method !== "GET" || e.request.url.startsWith("chrome-extension")) return;
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
 
-  e.respondWith(
-    fetch(e.request)
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    fetch(event.request)
       .then((response) => {
-        // Cache successful responses for local assets
-        if (response.status === 200 && e.request.url.startsWith(self.location.origin)) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, responseClone);
-          });
+        if (response.status === 200 && event.request.url.startsWith(self.location.origin)) {
+          const clone = response.clone();
+          void caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return response;
       })
-      .catch(() => {
-        return caches.match(e.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // If offline and requesting index.html or root
-          if (e.request.mode === "navigate") {
+      .catch(() =>
+        caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.mode === "navigate") {
             return caches.match("/");
           }
-        });
-      })
+          return Response.error();
+        })
+      )
   );
 });
