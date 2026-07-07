@@ -1,11 +1,11 @@
 {
-  "name": "Retail Sales Assist",
-  "short_name": "SalesAssist",
-  "description": "Mobile assistant app for retail team members",
+  "name": "Frido Sales Assist",
+  "short_name": "Frido",
+  "description": "Mobile assistant app for retail team members, powered by Frido Design System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A1128",
-  "theme_color": "#0A1128",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFD100",
   "orientation": "portrait-primary",
   "icons": [
     {

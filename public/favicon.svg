@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" fill="#FFD100"/>
+  <g transform="translate(10, 32)">
+    <!-- f -->
+    <path
+      d="M20 5c-3 0-5 2-5 5v12c0 2-1.5 3-3 3"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <path
+      d="M10 13h8"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <!-- r -->
+    <path
+      d="M27 13v12"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <path
+      d="M27 17c1.5-2.5 3.5-3.5 5.5-3.5"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <!-- i -->
+    <path
+      d="M40 13v12"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <circle cx="40" cy="7.5" r="2.2" fill="#101820" />
+    <!-- d -->
+    <path
+      d="M55 19c0 3.3-2.5 5.5-5.5 5.5S44 22.3 44 19s2.5-5.5 5.5-5.5 5.5 2.2 5.5 5.5z"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+    <path
+      d="M55 5v20"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      fill="none"
+    />
+    <!-- o -->
+    <circle
+      cx="68"
+      cy="19"
+      r="5.5"
+      stroke="#101820"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      fill="none"
+    />
+  </g>
+</svg>

@@ -1,17 +1,32 @@
 {
   "name": "retail-sales-assist",
-  "version": "1.0.0",
-  "description": "Retail Sales Assist Mobile Web Application",
-  "main": "js/app.js",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Retail Sales Assist — Next.js + TypeScript + Tailwind CSS + Hono + Bun",
   "scripts": {
-    "dev": "vite --host",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "server": "bun run server/index.ts",
+    "provision-admins": "bun --env-file=.env.local run scripts/provision-admins.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@clerk/nextjs": "7.5.13",
+    "hono": "^4.7.10",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "1.23.0",
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "postcss": "^8.5.4",
+    "sharp": "0.35.3",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5.8.3"
   }
 }
