@@ -207,6 +207,21 @@ export const db = {
   ): PostResult {
     const key = `fsh_log_${action}`;
     const items = db.getLocalList(action);
+    
+    // Check if an item with the same store and date already exists to overwrite it
+    if (data.store && data.date) {
+      const idx = items.findIndex(
+        (x: any) =>
+          String(x.store || "").toLowerCase() === String(data.store || "").toLowerCase() &&
+          String(x.date) === String(data.date)
+      );
+      if (idx > -1) {
+        items[idx] = { ...items[idx], ...data, ts: items[idx].ts || data.ts };
+        kv.set(key, JSON.stringify(items));
+        return { ok: true, saved: "local", data };
+      }
+    }
+    
     items.push(data);
     kv.set(key, JSON.stringify(items));
     return { ok: true, saved: "local", data };

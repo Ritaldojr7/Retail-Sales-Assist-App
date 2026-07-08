@@ -132,3 +132,58 @@ export function validateStoreEmail(email: string): string | null {
 }
 
 export const AUTHORIZED_STORE_EMAILS = Object.keys(STORE_BY_EMAIL);
+
+export function mapProfileStoreToSheetStore(profileStore: string, sheetStores: string[]): string {
+  const pStoreNorm = profileStore.toLowerCase();
+  
+  // 1. Direct exact or substring matches
+  for (const sheetStore of sheetStores) {
+    const sNorm = sheetStore.toLowerCase();
+    if (sNorm === pStoreNorm) return sheetStore;
+    
+    // Check if one contains the other
+    const cleanP = pStoreNorm.replace(/[^a-z0-9]/g, "");
+    const cleanS = sNorm.replace(/[^a-z0-9]/g, "");
+    if (cleanP && cleanS && (cleanP.includes(cleanS) || cleanS.includes(cleanP))) {
+      return sheetStore;
+    }
+  }
+  
+  // 2. Specific custom mappings
+  const mappings: Record<string, string> = {
+    "phoenix marketcity, vimannagar": "Phoenix Marketcity Vimannagar",
+    "amanora mall, magarpatta": "Amanora Experience Store",
+    "amar tech park, balewadi": "Amar Tech Park",
+    "elpro mall, pcmc": "Elpro PCMC",
+    "nexus westend, aundh": "Nexus Westend, Aundh",
+    "kopa mall, ghorpadi, kp": "Kopa Mall",
+    "lakeshore, y junction": "Lakeshore Y junction",
+    "gachibowli, hyderabad": "Frido Experience Store Gachibowli",
+    "banjara hills": "Frido Store Banjara Hills",
+    "bhartiya mall, bangalore": "Bhartiya Mall Store",
+    "kompally, hyderabad": "Kompally Store",
+    "vegas mall, dwarka": "Vegas Mall",
+    "lulu mall, bangalore": "Lulu Mall",
+    "golfcourse road, gurgaon": "Golf Course Road",
+    "omaxe world street, faridabad": "Omaxe Store",
+    "felix plaza, gurgaon": "Felix Plaza",
+    "pmc, whitefield bangalore": "PMC Whitefield",
+  };
+  
+  const key = pStoreNorm.trim();
+  if (mappings[key]) {
+    const match = sheetStores.find(s => s.toLowerCase() === mappings[key].toLowerCase());
+    if (match) return match;
+  }
+  
+  // 3. Fallback: match by non-generic words
+  const pWords = pStoreNorm.split(/[\s,]+/);
+  for (const word of pWords) {
+    if (word.length > 3 && !["mall", "road", "plaza", "store", "experience", "frido", "street"].includes(word)) {
+      const match = sheetStores.find(s => s.toLowerCase().includes(word));
+      if (match) return match;
+    }
+  }
+  
+  return profileStore;
+}

@@ -10,6 +10,7 @@ import {
   FileSpreadsheet,
   Users,
   ChevronRight,
+  BarChart3,
 } from "lucide-react";
 import Card from "@/components/Card";
 
@@ -45,6 +46,13 @@ function HomeView() {
       href: "/objection",
       icon: Mic,
       colorClass: "bg-green-500/10 text-green-600 border-l-green-500",
+    },
+    {
+      title: "Store Analytics Console",
+      desc: "Operational store metrics, trends & target planner",
+      href: "/store-analytics-console",
+      icon: BarChart3,
+      colorClass: "bg-amber-500/10 text-amber-600 border-l-amber-500",
     },
   ];
 
