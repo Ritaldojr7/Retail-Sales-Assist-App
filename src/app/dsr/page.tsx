@@ -713,7 +713,7 @@ export default function DSRPage() {
             </div>
 
             <div className="flex gap-4 mt-6">
-              <SecondaryButton onClick={handleSnapshot} disabled={snapping} className="flex-1">
+              <SecondaryButton onClick={() => void handleSnapshot()} disabled={snapping} className="flex-1">
                 <Camera className="w-4 h-4" />
                 {snapping ? "Capturing..." : "Snapshot"}
               </SecondaryButton>
