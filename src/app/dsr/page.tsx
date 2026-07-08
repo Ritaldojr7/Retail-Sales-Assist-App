@@ -17,7 +17,7 @@ import Card, { CardHeader, CardBody } from "@/components/Card";
 import { InputField, SelectField } from "@/components/Forms";
 import { PrimaryButton, SecondaryButton, IconButton } from "@/components/Buttons";
 import DataTable from "@/components/DataTable";
-import { Camera, Save, Trash2, ArrowLeft } from "lucide-react";
+import { Camera, Save, Trash2, ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function DSRPage() {
@@ -41,11 +41,13 @@ export default function DSRPage() {
   const [reviewsTaken, setReviewsTaken] = useState(0);
   const [leadsCaptured, setLeadsCaptured] = useState(0);
   const [lastMonthRev, setLastMonthRev] = useState(0);
+  
   // Mobility fields
   const [nmToday, setNmToday] = useState(0);
   const [nmMtd, setNmMtd] = useState(0);
   const [mToday, setMToday] = useState(0);
   const [mMtd, setMMtd] = useState(0);
+  
   // Single fields
   const [salesToday, setSalesToday] = useState(0);
   const [salesMtd, setSalesMtd] = useState(0);
@@ -53,6 +55,11 @@ export default function DSRPage() {
   const [saving, setSaving] = useState(false);
   const [snapping, setSnapping] = useState(false);
   const [historyItems, setHistoryItems] = useState<any[]>([]);
+
+  // Mobile Photos save popup states
+  const [showSnapshotModal, setShowSnapshotModal] = useState(false);
+  const [snapshotImgUrl, setSnapshotImgUrl] = useState("");
+  const [modalTitle, setModalTitle] = useState("Save DSR to Photos");
 
   useEffect(() => {
     loadHistory();
@@ -108,9 +115,79 @@ export default function DSRPage() {
     ? "Skycity"
     : activeStore.split(",")[0];
 
-  const handleSnapshot = async () => {
-    if (!captureRef.current) return;
+  const resetForm = () => {
+    setCcOrders(0);
+    setOnlineOrders(0);
+    setNewWalkins(0);
+    setOtherWalkins(0);
+    setCashCounter(0);
+    setReviewsTaken(0);
+    setLeadsCaptured(0);
+    setLastMonthRev(0);
+    setNmToday(0);
+    setNmMtd(0);
+    setMToday(0);
+    setMMtd(0);
+    setSalesToday(0);
+    setSalesMtd(0);
+    setDate(getTodayDate());
+  };
+
+  // Populate form fields and open snapshot preview modal
+  const loadSavedDsr = async (item: any) => {
+    // Populate form states
+    setDate(item.date || getTodayDate());
+    setCcOrders(Number(item.ccOrders) || 0);
+    setOnlineOrders(Number(item.onlineOrders) || 0);
+    setNewWalkins(Number(item.newWalkins) || 0);
+    setOtherWalkins(Number(item.otherWalkins) || 0);
+    setCashCounter(Number(item.cashCounter) || 0);
+    setReviewsTaken(Number(item.reviewsTaken) || 0);
+    setLeadsCaptured(Number(item.leadsCaptured) || 0);
+    setLastMonthRev(Number(item.lastMonthRev) || 0);
+    
+    // Mobility fields
+    setNmToday(Number(item.nmToday) || 0);
+    setNmMtd(Number(item.nmMtd) || 0);
+    setMToday(Number(item.mToday) || 0);
+    setMMtd(Number(item.mMtd) || 0);
+    
+    // Single fields
+    setSalesToday(Number(item.salesToday) || 0);
+    setSalesMtd(Number(item.salesMtd) || 0);
+    
+    if (isAdmin && item.store) {
+      setSelectedStore(item.store);
+    }
+
+    setModalTitle("Review Saved DSR Report");
+    toast("Generating review snapshot...");
+
+    // Give React states time to flush/render the updated DOM table
+    setTimeout(async () => {
+      if (!captureRef.current) return;
+      try {
+        const html2canvas = (await import("html2canvas")).default;
+        const canvas = await html2canvas(captureRef.current, {
+          backgroundColor: "#FFFFFF",
+          scale: 2,
+          logging: false,
+        });
+
+        const dataUrl = canvas.toDataURL("image/png");
+        setSnapshotImgUrl(dataUrl);
+        setShowSnapshotModal(true);
+      } catch (e) {
+        console.error(e);
+        toast("Failed to render preview snapshot.", true);
+      }
+    }, 150);
+  };
+
+  const handleSnapshot = async (silent = false) => {
+    if (!captureRef.current) return null;
     setSnapping(true);
+    setModalTitle("Save DSR to Photos");
 
     try {
       const html2canvas = (await import("html2canvas")).default;
@@ -120,19 +197,55 @@ export default function DSRPage() {
         logging: false,
       });
 
-      const link = document.createElement("a");
+      const dataUrl = canvas.toDataURL("image/png");
+      
+      if (!silent) {
+        setSnapshotImgUrl(dataUrl);
+        setShowSnapshotModal(true);
+      }
+
       const storeClean = activeStore
         .split(",")[0]
         .trim()
         .replace(/\s+/g, "_");
-      link.download = `DSR_${storeClean}_${date}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-      toast("DSR Snapshot captured & downloaded successfully!");
+
+      const filename = `DSR_${storeClean}_${date}.png`;
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+      
+      // Auto-download to device
+      if (blob) {
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: `DSR ${storeClean} ${date}`,
+              text: `Frido DSR Report for ${storeClean} (${date})`
+            });
+            if (!silent) toast("Share sheet triggered! Select 'Save Image' to save to your photos.");
+          } catch (e) {
+            // User cancelled share or failed, fallback to direct download
+            const link = document.createElement("a");
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+          }
+        } else {
+          // Direct download if share not supported
+          const link = document.createElement("a");
+          link.download = filename;
+          link.href = dataUrl;
+          link.click();
+          if (!silent) toast("Snapshot downloaded to your device.");
+        }
+      }
+      setSnapping(false);
+      return dataUrl;
     } catch {
-      toast("Snapshot rendering failed.", true);
+      if (!silent) toast("Snapshot rendering failed.", true);
+      setSnapping(false);
+      return null;
     }
-    setSnapping(false);
   };
 
   const handleSave = async () => {
@@ -144,16 +257,32 @@ export default function DSRPage() {
 
     setSaving(true);
     try {
+      // 0. Automatically capture and save the snapshot to the device
+      await handleSnapshot(true); // silent capture
+
+      // 1. Persist locally first so data is never lost
+      db.saveLocal("dsr", {
+        action: "dsr",
+        date,
+        store: activeStore,
+        ...metrics,
+        ts: new Date().toISOString(),
+      });
+      toast("DSR saved & Snapshot downloaded!");
+      loadHistory();
+      
+      // Clean form values to default initial state
+      resetForm();
+
+      // 2. Submit remote Apps Script post in the background
       await db.post({
         action: "dsr",
         date,
         store: activeStore,
         ...metrics,
       });
-      toast("DSR numbers successfully stored locally!");
-      loadHistory();
     } catch {
-      toast("Unable to save DSR metrics.", true);
+      console.warn("Apps Script submission offline.");
     }
     setSaving(false);
   };
@@ -186,9 +315,7 @@ export default function DSRPage() {
     {
       header: "MTD Revenue",
       accessor: (item: any) => {
-        const isMob =
-          (item.store as string)?.includes("Sky City Mall") ||
-          (item.store as string)?.toLowerCase().includes("skycity");
+        const isMob = isMobilityStore(item.store || "");
         const totalRev = isMob
           ? (Number(item.nmMtd) || 0) + (Number(item.mMtd) || 0)
           : Number(item.salesMtd) || 0;
@@ -199,9 +326,15 @@ export default function DSRPage() {
       header: "Actions",
       className: "text-right",
       accessor: (item: any) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-3 items-center">
+          <button
+            onClick={() => loadSavedDsr(item)}
+            className="text-brand-yellow font-bold fs-caption hover:underline"
+          >
+            Review
+          </button>
           <IconButton
-            icon={<Trash2 className="w-4 h-4 text-red-500 hover:text-red-600" />}
+            icon={<Trash2 className="w-4.5 h-4.5 text-red-500 hover:text-red-600" />}
             title="Delete log"
             onClick={() => handleDelete(item.ts as string)}
           />
@@ -376,97 +509,209 @@ export default function DSRPage() {
         {/* Preview & actions */}
         <div className="space-y-6">
           <Card>
-            <div className="p-1 border border-border rounded-sm bg-bg-secondary" ref={captureRef}>
-              <div className="w-full bg-[#FFD200] text-[#0A0A0A] py-2 px-3 text-center fs-caption font-bold uppercase tracking-wider rounded-t-[4px]">
-                DSR Format Log
-              </div>
-              <div className="p-4 space-y-3.5 fs-body text-text-primary">
-                <div className="flex justify-between border-b border-border pb-1.5">
-                  <span className="text-text-secondary">Date:</span>
-                  <span className="font-semibold">{metrics.dateStr}</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-1.5">
-                  <span className="text-text-secondary">Store:</span>
-                  <span className="font-semibold">{storeNameShort}</span>
-                </div>
-
-                <div className="pt-2">
-                  <div className="grid grid-cols-3 fs-small text-text-secondary font-semibold pb-1.5 uppercase tracking-wide">
-                    <span>Metric</span>
-                    <span className="text-right">Today</span>
-                    <span className="text-right">MTD</span>
-                  </div>
-
-                  {isMobility ? (
-                    <div className="space-y-1.5">
-                      <div className="grid grid-cols-3 border-b border-border/60 py-1">
-                        <span className="text-text-secondary fs-small">Non Mobility</span>
-                        <span className="text-right font-medium">{formatNum(metrics.nmToday)}</span>
-                        <span className="text-right font-medium">{formatNum(metrics.nmMtd)}</span>
-                      </div>
-                      <div className="grid grid-cols-3 border-b border-border/60 py-1">
-                        <span className="text-text-secondary fs-small">Mobility</span>
-                        <span className="text-right font-medium">{metrics.mToday > 0 ? formatNum(metrics.mToday) : "—"}</span>
-                        <span className="text-right font-medium">{formatNum(metrics.mMtd)}</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-3 border-b border-border/60 py-1">
-                      <span className="text-text-secondary fs-small">Sales Revenue</span>
-                      <span className="text-right font-medium">{formatNum(metrics.salesToday)}</span>
-                      <span className="text-right font-medium">{formatNum(metrics.salesMtd)}</span>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-3 border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">Orders (CC/Online)</span>
-                    <span className="text-right font-medium">{metrics.ccOrders}</span>
-                    <span className="text-right font-medium">{metrics.onlineOrders}</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">Walkins (New/Other)</span>
-                    <span className="text-right font-medium">{metrics.newWalkins}</span>
-                    <span className="text-right font-medium">{metrics.otherWalkins}</span>
-                  </div>
-
-                  <div className="flex justify-between border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">Conversion (CVR %)</span>
-                    <span className="font-bold">{formatPct(metrics.cvrRate, 2)}</span>
-                  </div>
-
-                  <div className="flex justify-between border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">Cash in Counter</span>
-                    <span className="font-bold">{formatNum(metrics.cashCounter)}</span>
-                  </div>
-
-                  <div className="flex justify-between border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">{isMobility ? "Reviews Taken" : "GMB Reviews"}</span>
-                    <span className="font-semibold">{metrics.reviewsTaken} ({formatPct(metrics.reviewRate, isMobility ? 2 : 0)})</span>
-                  </div>
-
-                  <div className="flex justify-between border-b border-border/60 py-2">
-                    <span className="text-text-secondary fs-small">Leads Captured</span>
-                    <span className="font-semibold">{metrics.leadsCaptured} ({formatPct(metrics.captureRate, 0)})</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 space-y-1">
-                  <div className="flex justify-between fs-small text-text-secondary">
-                    <span>Last Month Rev:</span>
-                    <span>{formatNum(metrics.lastMonthRev)}</span>
-                  </div>
-                  <div className="flex justify-between fs-small text-text-secondary">
-                    <span>Daily Avg/Day:</span>
-                    <span>{formatNum(metrics.dailyAverage)}</span>
-                  </div>
-                  <div className="flex justify-between fs-body font-bold text-text-primary pt-1.5 border-t border-border">
-                    <span>Projected Revenue:</span>
-                    <span>{formatNum(metrics.projectedRevenue)}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="p-2 bg-white rounded-xs border border-border overflow-hidden" ref={captureRef}>
+              {/* Exact Google Sheets Excel Style Grid Layout */}
+              {isMobility ? (
+                // ── Format for "Both" Category Stores (Non-Mobility + Mobility) ──
+                <table className="w-full border-collapse border-2 border-black text-[13px] font-sans text-black select-none">
+                  <thead>
+                    <tr className="bg-[#FFD200] border-b-2 border-black">
+                      <th colSpan={3} className="py-2.5 text-center font-bold text-[15px] tracking-wide text-black border-black">
+                        DSR Format
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-left">Date</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.dateStr}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Store</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{storeNameShort}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left"></td>
+                      <td className="font-bold bg-[#F5EBE6] p-1 border-r border-black text-center">Today</td>
+                      <td className="font-bold bg-[#F5EBE6] p-1 text-center">MTD</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Non Mobility Sales</td>
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{formatNum(metrics.nmToday)}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.nmMtd)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Mobility Sales</td>
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">
+                        {metrics.mToday > 0 ? formatNum(metrics.mToday) : ""}
+                      </td>
+                      <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.mMtd)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Orders</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">C&C</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Online</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.ccOrders}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.onlineOrders}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Walk-ins</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">New</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Other</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.newWalkins}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkins}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Total Walkins</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.totalWalkins}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">CVR %</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatPct(metrics.cvrRate, 2)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Cash In Counter</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{formatNum(metrics.cashCounter)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Review Taken</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Taken Rate</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.reviewsTaken}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.reviewRate, 2)}</td>
+                    </tr>
+                    <tr className="border-b-2 border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Leads Captured</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Capture Rate</td>
+                    </tr>
+                    <tr className="border-b-2 border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.leadsCaptured}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.captureRate, 0)}</td>
+                    </tr>
+                    <tr className="bg-[#FFD200] border-b border-black">
+                      <td colSpan={3} className="py-2.5 text-center font-bold text-[14px] text-black">
+                        ★ Revenue Insights ★
+                      </td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Last Month's Revenue</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.lastMonthRev)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Daily Average / Day</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.dailyAverage)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Projected Revenue</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.projectedRevenue)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              ) : (
+                // ── Format for "Non Mobility" Category Stores (Sales Today/MTD only) ──
+                <table className="w-full border-collapse border-2 border-black text-[13px] font-sans text-black select-none">
+                  <thead>
+                    <tr className="bg-[#FFD200] border-b-2 border-black">
+                      <th colSpan={3} className="py-2.5 text-center font-bold text-[15px] tracking-wide text-black border-black">
+                        DSR Format
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-left">Date</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.dateStr}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Store</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{storeNameShort}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Sales</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Today</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">MTD</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{formatNum(metrics.salesToday)}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.salesMtd)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Orders</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">C&C</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Online</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.ccOrders}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.onlineOrders}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Walk-ins</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">New</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Other</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.newWalkins}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkins}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Total</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.totalWalkins}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">CVR %</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatPct(metrics.cvrRate, 2)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Cash In Counter</td>
+                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{formatNum(metrics.cashCounter)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">GMB Reviews taken</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Taken Rate</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.reviewsTaken}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.reviewRate, 0)}</td>
+                    </tr>
+                    <tr className="border-b-2 border-black">
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Leads Captured</td>
+                      <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
+                      <td className="bg-[#F5EBE6] p-1 text-center">Captured Rate</td>
+                    </tr>
+                    <tr className="border-b-2 border-black">
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.leadsCaptured}</td>
+                      <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.captureRate, 0)}</td>
+                    </tr>
+                    <tr className="bg-[#FFD200] border-b border-black">
+                      <td colSpan={3} className="py-2.5 text-center font-bold text-[14px] text-black">
+                        ★ Revenue Insights ★
+                      </td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Last Month's Revenue</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.lastMonthRev)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Daily Average / Day</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.dailyAverage)}</td>
+                    </tr>
+                    <tr className="border-b border-black">
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Projected Revenue</td>
+                      <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.projectedRevenue)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
             </div>
+
             <div className="flex gap-4 mt-6">
               <SecondaryButton onClick={handleSnapshot} disabled={snapping} className="flex-1">
                 <Camera className="w-4 h-4" />
@@ -492,6 +737,51 @@ export default function DSRPage() {
           emptyMessage="No saved DSR submissions found."
         />
       </div>
+
+      {/* Fullscreen Snapshot Modal for Mobile Photos Saving & Review */}
+      {showSnapshotModal && (
+        <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-bg-secondary w-full max-w-md rounded-sm overflow-hidden border border-border shadow-elevation flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-bg-primary">
+              <span className="font-bold text-text-primary fs-body">{modalTitle}</span>
+              <button 
+                onClick={() => setShowSnapshotModal(false)}
+                className="text-text-tertiary hover:text-text-primary transition-120"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 flex-1 overflow-y-auto flex flex-col items-center gap-3">
+              <p className="fs-caption text-text-secondary text-center leading-normal">
+                To save directly to your phone photos:<br />
+                <b>1. Long press (tap and hold)</b> the image below.<br />
+                <b>2. Tap &quot;Save Image&quot; or &quot;Add to Photos&quot;.</b>
+              </p>
+              {snapshotImgUrl && (
+                <div className="border border-border rounded-xs overflow-hidden max-w-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={snapshotImgUrl} alt="DSR Snapshot" className="max-w-full h-auto object-contain bg-white" />
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-border bg-bg-primary flex gap-3">
+              <PrimaryButton 
+                onClick={() => {
+                  const link = document.createElement("a");
+                  const storeClean = activeStore.split(",")[0].trim().replace(/\s+/g, "_");
+                  link.download = `DSR_${storeClean}_${date}.png`;
+                  link.href = snapshotImgUrl;
+                  link.click();
+                  toast("Direct download triggered.");
+                }}
+                className="flex-1"
+              >
+                Download Directly
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
