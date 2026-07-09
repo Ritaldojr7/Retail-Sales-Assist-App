@@ -54,10 +54,11 @@ export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"store" | "suggest" | "links">("store");
 
   // Analytics
-  const [mtdRev, setMtdRev] = useState("₹2,84,250");
-  const [avgCvr, setAvgCvr] = useState("38%");
-  const [reviews, setReviews] = useState(4);
-  const [leads, setLeads] = useState(12);
+  const [mtdRev, setMtdRev] = useState("₹0");
+  const [avgCvr, setAvgCvr] = useState("0%");
+  const [reviews, setReviews] = useState(0);
+  const [leads, setLeads] = useState(0);
+  const [cvrData, setCvrData] = useState<{ day: string; pct: number }[]>([]);
 
   // Price Suggestion
   const [sugCat, setSugCat] = useState("");
@@ -89,41 +90,59 @@ export default function AnalyticsPage() {
     const cvr =
       totalWalkins > 0
         ? Math.round((totalOrders / totalWalkins) * 100)
-        : 38;
+        : 0;
     const totalReviews = dsrs.reduce(
       (acc, cur) => acc + (Number(cur.reviewsTaken) || 0),
-      4
+      0
     );
     const totalLeads =
       leadsLocal.length +
       dsrs.reduce(
         (acc, cur) => acc + (Number(cur.leadsCaptured) || 0),
-        12
+        0
       );
 
     setMtdRev(
       totalRev > 0
         ? `₹${totalRev.toLocaleString("en-IN")}`
-        : "₹2,84,250"
+        : "₹0"
     );
     setAvgCvr(`${cvr}%`);
     setReviews(totalReviews);
     setLeads(totalLeads);
-  }, [profile]);
 
-  // CVR bar chart data
-  const cvrData = useMemo(
-    () => [
-      { day: "Mon", pct: 32 },
-      { day: "Tue", pct: 40 },
-      { day: "Wed", pct: 28 },
-      { day: "Thu", pct: 45 },
-      { day: "Fri", pct: 52 },
-      { day: "Sat", pct: 55 },
-      { day: "Sun", pct: 48 },
-    ],
-    []
-  );
+    // Calculate CVR trend for the last 7 days of DSRs
+    const sortedDsrs = [...dsrs].sort(
+      (a, b) => new Date(a.date as string).getTime() - new Date(b.date as string).getTime()
+    );
+    const last7Dsrs = sortedDsrs.slice(-7);
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    if (last7Dsrs.length > 0) {
+      const calculatedData = last7Dsrs.map((d) => {
+        const dateObj = new Date(d.date as string);
+        const dayName = weekdays[dateObj.getDay()];
+        const walkins = (Number(d.newWalkins) || 0) + (Number(d.otherWalkins) || 0);
+        const orders = (Number(d.ccOrders) || 0) + (Number(d.onlineOrders) || 0);
+        const pct = walkins > 0 ? Math.round((orders / walkins) * 100) : 0;
+        return {
+          day: dayName,
+          pct: pct,
+        };
+      });
+      setCvrData(calculatedData);
+    } else {
+      setCvrData([
+        { day: "Mon", pct: 0 },
+        { day: "Tue", pct: 0 },
+        { day: "Wed", pct: 0 },
+        { day: "Thu", pct: 0 },
+        { day: "Fri", pct: 0 },
+        { day: "Sat", pct: 0 },
+        { day: "Sun", pct: 0 },
+      ]);
+    }
+  }, [profile]);
 
   const handleCalcSuggestion = () => {
     if (!sugCat) {

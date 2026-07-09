@@ -320,3 +320,12 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-hover-color);
 }
+
+/* Theme-dependent branding logo color */
+.brand-logo-img {
+  filter: none !important;
+}
+
+[data-theme="dark"] .brand-logo-img {
+  filter: invert(1) !important;
+}

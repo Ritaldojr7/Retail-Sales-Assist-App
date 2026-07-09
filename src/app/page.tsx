@@ -7,10 +7,8 @@ import {
   ClipboardList,
   TrendingDown,
   Mic,
-  FileSpreadsheet,
-  Users,
   ChevronRight,
-  BarChart3,
+  HelpCircle,
 } from "lucide-react";
 import Card from "@/components/Card";
 
@@ -27,6 +25,13 @@ function HomeView() {
 
   const coreActivities = [
     {
+      title: "Ask HQ Expert",
+      desc: "Submit specific queries to Frido product architects",
+      href: "/objection",
+      icon: HelpCircle,
+      colorClass: "bg-green-500/10 text-green-600 border-l-green-500",
+    },
+    {
       title: "Register a Lead",
       desc: "Capture customer details in the Zoho form",
       href: "/lead",
@@ -41,40 +46,34 @@ function HomeView() {
       colorClass: "bg-red-500/10 text-red-600 border-l-red-500 dark:text-red-400",
     },
     {
-      title: "Objections & Aggregation",
-      desc: "Record objection floor-audio & expert Q&A",
+      title: "Objection Aggregator",
+      desc: "Record customer objections floor-audio & review",
       href: "/objection",
       icon: Mic,
       colorClass: "bg-green-500/10 text-green-600 border-l-green-500",
-    },
-    {
-      title: "Store Analytics Console",
-      desc: "Operational store metrics, trends & target planner",
-      href: "/store-analytics-console",
-      icon: BarChart3,
-      colorClass: "bg-amber-500/10 text-amber-600 border-l-amber-500",
-    },
-  ];
-
-  const reports = [
-    {
-      title: "DSR Creation & Tracking",
-      desc: "Fill numbers, preview table, take snapshot & save",
-      href: "/dsr",
-      icon: FileSpreadsheet,
-      colorClass: "bg-brand-blue/10 text-brand-blue border-l-brand-blue",
-    },
-    {
-      title: "Mid-Day Footfall Reporting",
-      desc: "Weekly store mid-day entry & weekend compliance",
-      href: "/footfall",
-      icon: Users,
-      colorClass: "bg-amber-500/10 text-amber-600 border-l-amber-500",
     },
   ];
 
   return (
     <div className="space-y-6 py-2">
+      <div className="flex justify-center pt-2 pb-2">
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
+          <img
+            src="/logo-cropped.svg"
+            alt="Frido Logo"
+            className="brand-logo-img"
+            style={{
+              width: "auto",
+              height: "auto",
+              maxWidth: "180px",
+              maxHeight: "90px",
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
+      </div>
+
       {/* Hello Banner Card */}
       <div className="bg-bg-secondary border border-border p-4 rounded-sm flex flex-col gap-3 shadow-elevation">
         <div>
@@ -103,7 +102,7 @@ function HomeView() {
             const Icon = act.icon;
             return (
               <Card
-                key={act.href}
+                key={act.title}
                 interactive
                 onClick={() => router.push(act.href)}
                 className={`border-l-4 ${act.colorClass} hover:border-l-brand-yellow`}
@@ -118,39 +117,6 @@ function HomeView() {
                       <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-120 ml-auto" />
                     </h4>
                     <p className="fs-small text-text-secondary">{act.desc}</p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Reports Grid */}
-      <div>
-        <h3 className="fs-section font-bold text-text-primary mb-4 tracking-tight uppercase">
-          Reports & Submissions
-        </h3>
-        <div className="grid grid-cols-1 gap-4">
-          {reports.map((rep) => {
-            const Icon = rep.icon;
-            return (
-              <Card
-                key={rep.href}
-                interactive
-                onClick={() => router.push(rep.href)}
-                className={`border-l-4 ${rep.colorClass} hover:border-l-brand-yellow`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-sm bg-bg-primary border border-border flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5.5 h-5.5" />
-                  </div>
-                  <div className="flex-grow space-y-1">
-                    <h4 className="fs-body font-bold text-text-primary flex items-center gap-1 group-hover:text-brand-yellow">
-                      {rep.title}
-                      <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-120 ml-auto" />
-                    </h4>
-                    <p className="fs-small text-text-secondary">{rep.desc}</p>
                   </div>
                 </div>
               </Card>

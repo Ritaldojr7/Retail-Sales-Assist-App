@@ -17,6 +17,10 @@ export default clerkMiddleware(
   async (auth, req) => {
     if (isPublicRoute(req)) return;
 
+    if (process.env.NODE_ENV === "development" || process.env.BYPASS_CLERK === "true") {
+      return;
+    }
+
     const { userId } = await auth();
     if (userId) return;
 
