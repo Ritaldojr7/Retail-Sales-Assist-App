@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sun, Moon, ChevronLeft, User } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import FridoLogo from "./FridoLogo";
+
 
 const PAGE_TITLES: Record<string, string> = {
   "/": "Dashboard",
@@ -42,17 +42,9 @@ export default function Header() {
   return (
     <header id="topbar" className="mobile-header">
       <div className="mobile-header-inner">
-        {/* Left: logo on home, back + title elsewhere */}
+        {/* Left: title on home, back + title elsewhere */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          {isHome ? (
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center"
-              aria-label="Home"
-            >
-              <FridoLogo width={80} height={26} />
-            </button>
-          ) : (
+          {isHome ? null : (
             <>
               <button
                 onClick={() => router.back()}

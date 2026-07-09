@@ -4,7 +4,7 @@
   "private": true,
   "description": "Retail Sales Assist — Next.js + TypeScript + Tailwind CSS + Hono + Bun",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "rm -rf .next && next dev",
     "build": "next build",
     "start": "next start",
     "server": "bun run server/index.ts",

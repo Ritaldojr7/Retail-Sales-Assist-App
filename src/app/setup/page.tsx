@@ -84,31 +84,17 @@ export default function SetupPage() {
 
           {!isAdminProfile(profile) && (
             <>
-              <SelectField
+              <InputField
                 label="City"
                 required
                 value={profile?.city || ""}
-                onChange={() => {}}
-                options={
-                  profile?.city
-                    ? [{ label: profile.city, value: profile.city }]
-                    : []
-                }
-                placeholder="City"
                 disabled
               />
 
-              <SelectField
+              <InputField
                 label="Store"
                 required
                 value={profile?.store || ""}
-                onChange={() => {}}
-                options={
-                  profile?.store
-                    ? [{ label: profile.store, value: profile.store }]
-                    : []
-                }
-                placeholder="Store"
                 disabled
               />
             </>
@@ -143,7 +129,10 @@ export default function SetupPage() {
             <ArrowRight className="w-4 h-4" />
           </PrimaryButton>
           <SecondaryButton
-            onClick={() => signOut({ redirectUrl: "/sign-in" })}
+            onClick={async () => {
+              await signOut();
+              window.location.href = "/sign-in";
+            }}
             className="w-full"
           >
             <LogOut className="w-4 h-4" />

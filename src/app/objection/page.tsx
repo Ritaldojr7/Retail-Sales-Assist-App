@@ -8,7 +8,7 @@ import type { QAItem } from "@/lib/types";
 import Card, { CardHeader, CardBody } from "@/components/Card";
 import { InputField, TextArea } from "@/components/Forms";
 import { PrimaryButton, SecondaryButton, IconButton } from "@/components/Buttons";
-import { ArrowLeft, Mic, StopCircle, RefreshCw, Send, Volume2, User } from "lucide-react";
+import { ArrowLeft, Mic, StopCircle, RefreshCw, Send, Volume2, User, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const MAX_RECORDING_SECS = 120;
@@ -47,6 +47,7 @@ export default function ObjectionPage() {
   const [feedItems, setFeedItems] = useState<QAItem[]>([]);
   const [question, setQuestion] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load feed on mount
   useEffect(() => {
@@ -231,8 +232,13 @@ export default function ObjectionPage() {
   };
 
   const filteredFeed = feedItems.filter((item) => {
-    if (feedTab === "all") return true;
-    return item.deviceId === profile?.deviceId;
+    const matchesTab = feedTab === "all" || item.deviceId === profile?.deviceId;
+    if (!matchesTab) return false;
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const questionMatch = item.question?.toLowerCase().includes(query) || false;
+    const answerMatch = item.answer?.toLowerCase().includes(query) || false;
+    return questionMatch || answerMatch;
   });
 
   return (
@@ -241,7 +247,7 @@ export default function ObjectionPage() {
       <div className="flex items-center gap-4">
         <IconButton icon={<ArrowLeft className="w-4.5 h-4.5" />} onClick={() => router.push("/")} aria-label="Go back" />
         <div>
-          <h2 className="fs-h2 font-bold text-text-primary tracking-tight">Objections & Aggregation</h2>
+          <h2 className="fs-h2 font-bold text-text-primary tracking-tight">Objection Aggregator</h2>
           <p className="fs-small text-text-secondary mt-0.5">Record customer objections floor-audio & review expert answers.</p>
         </div>
       </div>
@@ -335,6 +341,18 @@ export default function ObjectionPage() {
               </PrimaryButton>
 
               <hr className="border-border/60 my-6" />
+
+              {/* Search Bar */}
+              <div className="relative mb-4">
+                <input
+                  type="text"
+                  placeholder="Search answered queries..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-11 pl-10 pr-4 rounded-sm border border-border bg-bg-secondary text-text-primary fs-body focus-ring transition-120 placeholder-text-tertiary"
+                />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-tertiary" />
+              </div>
 
               {/* Tabs */}
               <div className="flex bg-bg-primary p-1 border border-border rounded-sm gap-1">

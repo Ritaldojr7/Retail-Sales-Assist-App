@@ -568,7 +568,7 @@ export default function StoreAnalyticsConsolePage() {
           <button
             onClick={() => setActiveConsole("ho")}
             className={`flex-1 py-1.5 fs-caption font-bold rounded-xs transition-120 text-center uppercase tracking-wider ${
-              activeConsole === "ho" ? "bg-brand-yellow text-text-inverse" : "text-text-secondary hover:text-text-primary"
+              activeConsole === "ho" ? "bg-brand-yellow text-[#0A0A0A]" : "text-text-secondary hover:text-text-primary"
             }`}
           >
             HO Console
@@ -576,7 +576,7 @@ export default function StoreAnalyticsConsolePage() {
           <button
             onClick={() => setActiveConsole("manager")}
             className={`flex-1 py-1.5 fs-caption font-bold rounded-xs transition-120 text-center uppercase tracking-wider ${
-              activeConsole === "manager" ? "bg-brand-yellow text-text-inverse" : "text-text-secondary hover:text-text-primary"
+              activeConsole === "manager" ? "bg-brand-yellow text-[#0A0A0A]" : "text-text-secondary hover:text-text-primary"
             }`}
           >
             Store Manager

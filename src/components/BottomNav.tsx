@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { tab: "home", href: "/", label: "Home", icon: LayoutDashboard },
   { tab: "dsr", href: "/dsr", label: "DSR", icon: FileSpreadsheet },
   { tab: "footfall", href: "/footfall", label: "Footfall", icon: Users },
-  { tab: "analytics", href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { tab: "store-analytics-console", href: "/store-analytics-console", label: "Store Analytics", icon: BarChart3 },
 ] as const;
 
 export default function BottomNav() {
