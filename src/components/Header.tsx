@@ -15,6 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/footfall": "Footfall",
   "/analytics": "Analytics",
   "/setup": "Profile Setup",
+  "/store-analytics-console": "Store Analytics",
 };
 
 export default function Header() {
