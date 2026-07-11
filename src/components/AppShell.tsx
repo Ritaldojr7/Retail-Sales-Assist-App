@@ -6,6 +6,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import BottomNav from "./BottomNav";
 import SyncProfile from "./SyncProfile";
+import ObjectionWidget from "./ObjectionWidget";
+import AskHqWidget from "./AskHqWidget";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -27,14 +29,19 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="mobile-shell">
+    <div className="app-layout-container">
       <SyncProfile />
-      <Header />
-      <main className="mobile-main">
-        <div className="mobile-content">{children}</div>
-        <Footer />
-      </main>
-      <BottomNav />
+      <ObjectionWidget />
+      <AskHqWidget />
+      <div className="mobile-shell">
+        <Header />
+        <main className="mobile-main">
+          <div className="mobile-content">{children}</div>
+          <Footer />
+        </main>
+        <BottomNav />
+      </div>
     </div>
   );
 }
+

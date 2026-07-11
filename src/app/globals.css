@@ -329,3 +329,236 @@ textarea {
 [data-theme="dark"] .brand-logo-img {
   filter: invert(1) !important;
 }
+
+/* ── Side Widget Panel Styles ── */
+.app-layout-container {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--bg-tertiary);
+  width: 100%;
+}
+
+.widget-panel-left,
+.widget-panel-right {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 340px;
+  z-index: 150;
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-elevation);
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-panel-left {
+  border-right: 1px solid var(--border-color);
+  right: 50%;
+  margin-right: 280px; /* aligns next to the 560px centered app container */
+  transform: translateX(-120%); /* starts hidden completely to the left */
+}
+
+.widget-panel-right {
+  border-left: 1px solid var(--border-color);
+  left: 50%;
+  margin-left: 280px; /* aligns next to the 560px centered app container */
+  transform: translateX(120%); /* starts hidden completely to the right */
+}
+
+.widget-panel-left.widget-open {
+  transform: translateX(0);
+}
+
+.widget-panel-right.widget-open {
+  transform: translateX(0);
+}
+
+/* Floating triggers for widgets */
+.widget-trigger-left {
+  position: fixed;
+  top: 250px;
+  left: 0;
+  z-index: 130;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-left: none;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: #10B981; /* Green color for mic */
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+  cursor: grab;
+  transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms ease, box-shadow 150ms ease;
+  overflow: hidden;
+  animation: float-pulse-green 3s infinite ease-in-out;
+  flex-direction: row;
+  user-select: none;
+  touch-action: none; /* prevent scrolling when dragging */
+}
+
+.widget-trigger-left:active {
+  cursor: grabbing;
+}
+
+.widget-trigger-left:hover {
+  width: 140px;
+  padding: 0 12px;
+  background-color: var(--bg-primary);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.widget-trigger-right {
+  position: fixed;
+  top: 250px;
+  right: 0;
+  z-index: 130;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  color: #F59E0B; /* Yellow/Orange color for ask hq */
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+  cursor: grab;
+  transition: width 240ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms ease, box-shadow 150ms ease;
+  overflow: hidden;
+  animation: float-pulse-yellow 3s infinite ease-in-out;
+  flex-direction: row-reverse;
+  user-select: none;
+  touch-action: none; /* prevent scrolling when dragging */
+}
+
+.widget-trigger-right:active {
+  cursor: grabbing;
+}
+
+.widget-trigger-right:hover {
+  width: 120px;
+  padding: 0 12px;
+  background-color: var(--bg-primary);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+
+.trigger-text-left,
+.trigger-text-right {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 150ms ease-out, max-width 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+  pointer-events: none;
+}
+
+.widget-trigger-left:hover .trigger-text-left,
+.widget-trigger-right:hover .trigger-text-right {
+  opacity: 1;
+  max-width: 100px;
+}
+
+@keyframes float-pulse-green {
+  0% { box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 2px 18px rgba(16, 185, 129, 0.45); }
+  100% { box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2); }
+}
+
+@keyframes float-pulse-yellow {
+  0% { box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
+  50% { box-shadow: 0 2px 18px rgba(245, 158, 11, 0.45); }
+  100% { box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
+}
+
+.widget-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 140;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 200ms ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive Overrides */
+@media (max-width: 1240px) {
+  .widget-panel-left {
+    left: 0;
+    right: auto;
+    margin-right: 0;
+    width: 85%;
+    max-width: 360px;
+    transform: translateX(-100%);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .widget-panel-right {
+    right: 0;
+    left: auto;
+    margin-left: 0;
+    width: 85%;
+    max-width: 360px;
+    transform: translateX(100%);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .widget-panel-left.widget-open {
+    transform: translateX(0);
+  }
+
+  .widget-panel-right.widget-open {
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 1241px) {
+  .widget-backdrop {
+    display: none;
+  }
+  .widget-trigger-left {
+    left: 50%;
+    margin-left: -326px; /* -280px (half-shell) - 44px (trigger-width) - 2px gap */
+    border-left: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    flex-direction: row-reverse;
+  }
+  .widget-trigger-left:hover {
+    padding: 0 12px;
+  }
+
+  .widget-trigger-right {
+    right: 50%;
+    margin-right: -326px; /* 280px (half-shell) + 44px (trigger-width) + 2px gap from right of center */
+    border-right: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    flex-direction: row;
+  }
+  .widget-trigger-right:hover {
+    padding: 0 12px;
+  }
+}
+
