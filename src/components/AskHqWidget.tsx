@@ -161,7 +161,7 @@ export default function AskHqWidget() {
       {/* Widget Container Panel */}
       <div className={`widget-panel-right ${askHqOpen ? "widget-open" : ""}`}>
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border p-4 bg-bg-secondary">
+        <div className="flex items-center justify-between border-b border-border p-4 bg-bg-secondary widget-header">
           <div>
             <h3 className="fs-h3 font-bold text-text-primary tracking-tight">
               Ask HQ Experts
