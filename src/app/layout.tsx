@@ -3,9 +3,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { ProfileProvider } from "@/hooks/useProfile";
 import { ToastProvider } from "@/hooks/useToast";
+import { WidgetProvider } from "@/hooks/useWidgets";
 import AppShell from "@/components/AppShell";
 import Toast from "@/components/Toast";
 import RegisterPwa from "@/components/RegisterPwa";
+
 
 export const metadata: Metadata = {
   title: "Frido Sales Assist",
@@ -53,8 +55,10 @@ export default function RootLayout({
         >
           <ProfileProvider>
             <ToastProvider>
-              <AppShell>{children}</AppShell>
-              <Toast />
+              <WidgetProvider>
+                <AppShell>{children}</AppShell>
+                <Toast />
+              </WidgetProvider>
             </ToastProvider>
           </ProfileProvider>
         </ClerkProvider>

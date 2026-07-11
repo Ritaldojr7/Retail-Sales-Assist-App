@@ -6,9 +6,7 @@ import { useProfile } from "@/hooks/useProfile";
 import {
   ClipboardList,
   TrendingDown,
-  Mic,
   ChevronRight,
-  HelpCircle,
 } from "lucide-react";
 import Card from "@/components/Card";
 
@@ -25,32 +23,18 @@ function HomeView() {
 
   const coreActivities = [
     {
-      title: "Ask HQ Expert",
-      desc: "Submit specific queries to Frido product architects",
-      href: "/objection",
-      icon: HelpCircle,
-      colorClass: "bg-green-500/10 text-green-600 border-l-green-500",
-    },
-    {
       title: "Register a Lead",
       desc: "Capture customer details in the Zoho form",
-      href: "/lead",
+      onClick: () => router.push("/lead"),
       icon: ClipboardList,
       colorClass: "bg-brand-blue/10 text-brand-blue border-l-brand-blue",
     },
     {
       title: "Log a Lost Sale (R-Loss)",
       desc: "Tell us why the sale didn't happen",
-      href: "/rloss",
+      onClick: () => router.push("/rloss"),
       icon: TrendingDown,
       colorClass: "bg-red-500/10 text-red-600 border-l-red-500 dark:text-red-400",
-    },
-    {
-      title: "Objection Aggregator",
-      desc: "Record customer objections floor-audio & review",
-      href: "/objection",
-      icon: Mic,
-      colorClass: "bg-green-500/10 text-green-600 border-l-green-500",
     },
   ];
 
@@ -104,7 +88,7 @@ function HomeView() {
               <Card
                 key={act.title}
                 interactive
-                onClick={() => router.push(act.href)}
+                onClick={act.onClick}
                 className={`border-l-4 ${act.colorClass} hover:border-l-brand-yellow`}
               >
                 <div className="flex items-start gap-4">
