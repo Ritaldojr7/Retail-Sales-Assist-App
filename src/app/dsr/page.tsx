@@ -20,6 +20,16 @@ import DataTable from "@/components/DataTable";
 import { Camera, Save, Trash2, ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+/**
+ * DSRPage component.
+ * 
+ * Metrics Formulas:
+ * - CVR % = (Total Orders / New Walk-ins) * 100
+ *   where Total Orders = CC Orders + Online Orders
+ * 
+ * - Captured Rate % = (Leads Captured / Non-Converting Walk-ins) * 100
+ *   where Non-Converting Walk-ins = New Walk-ins - Total Orders
+ */
 export default function DSRPage() {
   const { profile } = useProfile();
   const { toast } = useToast();
