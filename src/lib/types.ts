@@ -67,6 +67,7 @@ export interface RLossPayload {
   value: string;
   leadRegistered: string;
   notes: string;
+  cxIntent?: string;
 }
 
 export interface FootfallPayload {
