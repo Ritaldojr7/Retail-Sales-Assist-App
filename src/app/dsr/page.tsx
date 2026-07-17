@@ -11,6 +11,7 @@ import {
   formatNum,
   formatPct,
   getTodayDate,
+  captureDsrSnapshot,
 } from "@/lib/dsr-utils";
 import type { DSRFormValues, DSRMetrics } from "@/lib/types";
 import Card, { CardHeader, CardBody } from "@/components/Card";
@@ -47,6 +48,8 @@ export default function DSRPage() {
   const [onlineOrders, setOnlineOrders] = useState(0);
   const [newWalkins, setNewWalkins] = useState(0);
   const [otherWalkins, setOtherWalkins] = useState(0);
+  const [newWalkinsMtd, setNewWalkinsMtd] = useState(0);
+  const [otherWalkinsMtd, setOtherWalkinsMtd] = useState(0);
   const [cashCounter, setCashCounter] = useState(0);
   const [reviewsTaken, setReviewsTaken] = useState(0);
   const [leadsCaptured, setLeadsCaptured] = useState(0);
@@ -86,6 +89,8 @@ export default function DSRPage() {
       onlineOrders,
       newWalkins,
       otherWalkins,
+      newWalkinsMtd,
+      otherWalkinsMtd,
       cashCounter,
       reviewsTaken,
       leadsCaptured,
@@ -103,6 +108,8 @@ export default function DSRPage() {
       onlineOrders,
       newWalkins,
       otherWalkins,
+      newWalkinsMtd,
+      otherWalkinsMtd,
       cashCounter,
       reviewsTaken,
       leadsCaptured,
@@ -130,6 +137,8 @@ export default function DSRPage() {
     setOnlineOrders(0);
     setNewWalkins(0);
     setOtherWalkins(0);
+    setNewWalkinsMtd(0);
+    setOtherWalkinsMtd(0);
     setCashCounter(0);
     setReviewsTaken(0);
     setLeadsCaptured(0);
@@ -151,6 +160,8 @@ export default function DSRPage() {
     setOnlineOrders(Number(item.onlineOrders) || 0);
     setNewWalkins(Number(item.newWalkins) || 0);
     setOtherWalkins(Number(item.otherWalkins) || 0);
+    setNewWalkinsMtd(Number(item.newWalkinsMtd) || 0);
+    setOtherWalkinsMtd(Number(item.otherWalkinsMtd) || 0);
     setCashCounter(Number(item.cashCounter) || 0);
     setReviewsTaken(Number(item.reviewsTaken) || 0);
     setLeadsCaptured(Number(item.leadsCaptured) || 0);
@@ -177,12 +188,7 @@ export default function DSRPage() {
     setTimeout(async () => {
       if (!captureRef.current) return;
       try {
-        const html2canvas = (await import("html2canvas")).default;
-        const canvas = await html2canvas(captureRef.current, {
-          backgroundColor: "#FFFFFF",
-          scale: 2,
-          logging: false,
-        });
+        const canvas = await captureDsrSnapshot(captureRef.current);
 
         const dataUrl = canvas.toDataURL("image/png");
         setSnapshotImgUrl(dataUrl);
@@ -200,12 +206,7 @@ export default function DSRPage() {
     setModalTitle("Save DSR to Photos");
 
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(captureRef.current, {
-        backgroundColor: "#FFFFFF",
-        scale: 2,
-        logging: false,
-      });
+      const canvas = await captureDsrSnapshot(captureRef.current);
 
       const dataUrl = canvas.toDataURL("image/png");
       
@@ -398,14 +399,16 @@ export default function DSRPage() {
                     <InputField
                       label="Non Mobility Today (₹)"
                       type="number"
-                      value={nmToday}
+                      value={nmToday === 0 ? "" : nmToday}
+                      placeholder="0"
                       min={0}
                       onChange={(e) => setNmToday(Number(e.target.value) || 0)}
                     />
                     <InputField
                       label="Non Mobility MTD (₹)"
                       type="number"
-                      value={nmMtd}
+                      value={nmMtd === 0 ? "" : nmMtd}
+                      placeholder="0"
                       min={0}
                       onChange={(e) => setNmMtd(Number(e.target.value) || 0)}
                     />
@@ -414,14 +417,16 @@ export default function DSRPage() {
                     <InputField
                       label="Mobility Today (₹)"
                       type="number"
-                      value={mToday}
+                      value={mToday === 0 ? "" : mToday}
+                      placeholder="0"
                       min={0}
                       onChange={(e) => setMToday(Number(e.target.value) || 0)}
                     />
                     <InputField
                       label="Mobility MTD (₹)"
                       type="number"
-                      value={mMtd}
+                      value={mMtd === 0 ? "" : mMtd}
+                      placeholder="0"
                       min={0}
                       onChange={(e) => setMMtd(Number(e.target.value) || 0)}
                     />
@@ -432,14 +437,16 @@ export default function DSRPage() {
                   <InputField
                     label="Sales Today (₹)"
                     type="number"
-                    value={salesToday}
+                    value={salesToday === 0 ? "" : salesToday}
+                    placeholder="0"
                     min={0}
                     onChange={(e) => setSalesToday(Number(e.target.value) || 0)}
                   />
                   <InputField
                     label="Sales MTD (₹)"
                     type="number"
-                    value={salesMtd}
+                    value={salesMtd === 0 ? "" : salesMtd}
+                    placeholder="0"
                     min={0}
                     onChange={(e) => setSalesMtd(Number(e.target.value) || 0)}
                   />
@@ -450,14 +457,16 @@ export default function DSRPage() {
                 <InputField
                   label="C&C Orders"
                   type="number"
-                  value={ccOrders}
+                  value={ccOrders === 0 ? "" : ccOrders}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setCcOrders(Number(e.target.value) || 0)}
                 />
                 <InputField
                   label="Online Orders"
                   type="number"
-                  value={onlineOrders}
+                  value={onlineOrders === 0 ? "" : onlineOrders}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setOnlineOrders(Number(e.target.value) || 0)}
                 />
@@ -465,25 +474,47 @@ export default function DSRPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label="New Walk-ins"
+                  label="New Walk-ins Today"
                   type="number"
-                  value={newWalkins}
+                  value={newWalkins === 0 ? "" : newWalkins}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setNewWalkins(Number(e.target.value) || 0)}
                 />
                 <InputField
-                  label="Other Walk-ins"
+                  label="Other Walk-ins Today"
                   type="number"
-                  value={otherWalkins}
+                  value={otherWalkins === 0 ? "" : otherWalkins}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setOtherWalkins(Number(e.target.value) || 0)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <InputField
+                  label="New Walk-ins MTD"
+                  type="number"
+                  value={newWalkinsMtd === 0 ? "" : newWalkinsMtd}
+                  placeholder="0"
+                  min={0}
+                  onChange={(e) => setNewWalkinsMtd(Number(e.target.value) || 0)}
+                />
+                <InputField
+                  label="Other Walk-ins MTD"
+                  type="number"
+                  value={otherWalkinsMtd === 0 ? "" : otherWalkinsMtd}
+                  placeholder="0"
+                  min={0}
+                  onChange={(e) => setOtherWalkinsMtd(Number(e.target.value) || 0)}
                 />
               </div>
 
               <InputField
                 label="Cash In Counter (₹)"
                 type="number"
-                value={cashCounter}
+                value={cashCounter === 0 ? "" : cashCounter}
+                placeholder="0"
                 min={0}
                 onChange={(e) => setCashCounter(Number(e.target.value) || 0)}
               />
@@ -492,14 +523,16 @@ export default function DSRPage() {
                 <InputField
                   label="Reviews Taken"
                   type="number"
-                  value={reviewsTaken}
+                  value={reviewsTaken === 0 ? "" : reviewsTaken}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setReviewsTaken(Number(e.target.value) || 0)}
                 />
                 <InputField
                   label="Leads Captured"
                   type="number"
-                  value={leadsCaptured}
+                  value={leadsCaptured === 0 ? "" : leadsCaptured}
+                  placeholder="0"
                   min={0}
                   onChange={(e) => setLeadsCaptured(Number(e.target.value) || 0)}
                 />
@@ -508,7 +541,8 @@ export default function DSRPage() {
               <InputField
                 label="Last Month's Revenue Reference (₹)"
                 type="number"
-                value={lastMonthRev}
+                value={lastMonthRev === 0 ? "" : lastMonthRev}
+                placeholder="0"
                 min={0}
                 onChange={(e) => setLastMonthRev(Number(e.target.value) || 0)}
               />
@@ -519,7 +553,7 @@ export default function DSRPage() {
         {/* Preview & actions */}
         <div className="space-y-6">
           <Card>
-            <div className="p-2 bg-white rounded-xs border border-border overflow-hidden" ref={captureRef}>
+            <div data-dsr-capture className="p-2 bg-white rounded-xs border border-border overflow-hidden" ref={captureRef}>
               {/* Exact Google Sheets Excel Style Grid Layout */}
               {isMobility ? (
                 // ── Format for "Both" Category Stores (Non-Mobility + Mobility) ──
@@ -533,32 +567,32 @@ export default function DSRPage() {
                   </thead>
                   <tbody>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-left">Date</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-center">Date</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.dateStr}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Store</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Store</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{storeNameShort}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left"></td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center"></td>
                       <td className="font-bold bg-[#F5EBE6] p-1 border-r border-black text-center">Today</td>
                       <td className="font-bold bg-[#F5EBE6] p-1 text-center">MTD</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Non Mobility Sales</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Non Mobility Sales</td>
                       <td className="p-2 border-r border-black text-center font-medium bg-white">{formatNum(metrics.nmToday)}</td>
                       <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.nmMtd)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Mobility Sales</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Mobility Sales</td>
                       <td className="p-2 border-r border-black text-center font-medium bg-white">
                         {metrics.mToday > 0 ? formatNum(metrics.mToday) : ""}
                       </td>
                       <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.mMtd)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Orders</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Orders</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">C&C</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Online</td>
                     </tr>
@@ -567,7 +601,7 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{metrics.onlineOrders}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Walk-ins</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Walk-ins Today</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">New</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Other</td>
                     </tr>
@@ -576,19 +610,20 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkins}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Total Walkins</td>
-                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.totalWalkins}</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Walk-ins MTD</td>
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.newWalkinsMtd}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkinsMtd}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">CVR %</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">CVR %</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatPct(metrics.cvrRate, 2)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Cash In Counter</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Cash In Counter</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{formatNum(metrics.cashCounter)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Review Taken</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Review Taken</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Taken Rate</td>
                     </tr>
@@ -597,7 +632,7 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.reviewRate, 2)}</td>
                     </tr>
                     <tr className="border-b-2 border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Leads Captured</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Leads Captured</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Capture Rate</td>
                     </tr>
@@ -611,15 +646,15 @@ export default function DSRPage() {
                       </td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Last Month's Revenue</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Last Month's Revenue</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.lastMonthRev)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Daily Average / Day</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Daily Average / Day</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.dailyAverage)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Projected Revenue</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Projected Revenue</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.projectedRevenue)}</td>
                     </tr>
                   </tbody>
@@ -636,15 +671,15 @@ export default function DSRPage() {
                   </thead>
                   <tbody>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-left">Date</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black w-2/5 text-center">Date</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.dateStr}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Store</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Store</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{storeNameShort}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Sales</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Sales</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Today</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">MTD</td>
                     </tr>
@@ -653,7 +688,7 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{formatNum(metrics.salesMtd)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Orders</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Orders</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">C&C</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Online</td>
                     </tr>
@@ -662,7 +697,7 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{metrics.onlineOrders}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Walk-ins</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Walk-ins Today</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">New</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Other</td>
                     </tr>
@@ -671,19 +706,20 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkins}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Total</td>
-                      <td colSpan={2} className="p-2 text-center font-medium bg-white">{metrics.totalWalkins}</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Walk-ins MTD</td>
+                      <td className="p-2 border-r border-black text-center font-medium bg-white">{metrics.newWalkinsMtd}</td>
+                      <td className="p-2 text-center font-medium bg-white">{metrics.otherWalkinsMtd}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">CVR %</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">CVR %</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatPct(metrics.cvrRate, 2)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Cash In Counter</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Cash In Counter</td>
                       <td colSpan={2} className="p-2 text-center font-medium bg-white">{formatNum(metrics.cashCounter)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">GMB Reviews taken</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">GMB Reviews taken</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Taken Rate</td>
                     </tr>
@@ -692,7 +728,7 @@ export default function DSRPage() {
                       <td className="p-2 text-center font-medium bg-white">{formatPct(metrics.reviewRate, 0)}</td>
                     </tr>
                     <tr className="border-b-2 border-black">
-                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left align-middle">Leads Captured</td>
+                      <td rowSpan={2} className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center align-middle">Leads Captured</td>
                       <td className="bg-[#F5EBE6] p-1 border-r border-black text-center">Total</td>
                       <td className="bg-[#F5EBE6] p-1 text-center">Captured Rate</td>
                     </tr>
@@ -706,15 +742,15 @@ export default function DSRPage() {
                       </td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Last Month's Revenue</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Last Month's Revenue</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.lastMonthRev)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Daily Average / Day</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Daily Average / Day</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.dailyAverage)}</td>
                     </tr>
                     <tr className="border-b border-black">
-                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-left">Projected Revenue</td>
+                      <td className="font-bold bg-[#F5EBE6] p-2 border-r border-black text-center">Projected Revenue</td>
                       <td colSpan={2} className="p-2 text-center font-bold bg-white">{formatNum(metrics.projectedRevenue)}</td>
                     </tr>
                   </tbody>

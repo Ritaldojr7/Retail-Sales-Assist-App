@@ -21,6 +21,8 @@ export interface DSRMetrics {
   newWalkins: number;
   otherWalkins: number;
   totalWalkins: number;
+  newWalkinsMtd: number;
+  otherWalkinsMtd: number;
   cashCounter: number;
   reviewsTaken: number;
   leadsCaptured: number;
@@ -44,6 +46,8 @@ export interface DSRFormValues {
   onlineOrders: number;
   newWalkins: number;
   otherWalkins: number;
+  newWalkinsMtd: number;
+  otherWalkinsMtd: number;
   cashCounter: number;
   reviewsTaken: number;
   leadsCaptured: number;
