@@ -80,8 +80,8 @@ export default function AnalyticsPage() {
 
     dsrs.forEach((d) => {
       totalRev +=
-        (Number(d.nonMobilityMtd) || 0) +
-        (Number(d.mobilityMtd) || 0);
+        (Number(d.nmMtd) || 0) +
+        (Number(d.mMtd) || 0);
       totalWalkins += Number(d.newWalkins) || 0;
       totalOrders +=
         (Number(d.ccOrders) || 0) + (Number(d.onlineOrders) || 0);
