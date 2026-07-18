@@ -1,28 +1,7 @@
 import type { DSRFormValues, DSRMetrics } from "./types";
 
-/** Check if selected store is in Both category (Mobility + Non Mobility) */
 export function isMobilityStore(store: string): boolean {
-  if (!store) return false;
-  const norm = store.toLowerCase();
-  
-  // List of stores marked as "Both" in the category master
-  const bothKeywords = [
-    "amar tech park",
-    "balewadi",
-    "sky city",
-    "skycity",
-    "borivali",
-    "gachibowli",
-    "banjara",
-    "kompally",
-    "lulu",
-    "golf course",
-    "golfcourse",
-    "omaxe",
-    "felix"
-  ];
-  
-  return bothKeywords.some(keyword => norm.includes(keyword));
+  return true;
 }
 
 /** Calculate all DSR metrics from form values */
